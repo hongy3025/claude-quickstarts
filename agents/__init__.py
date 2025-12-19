@@ -1,4 +1,6 @@
-"""Core agent implementations."""
+"""Core agent implementations.
+核心 Agent 实现。
+"""
 
 from .agent import Agent, ModelConfig
 from .tools.base import Tool

@@ -1,4 +1,6 @@
-"""Tools module for agent framework."""
+"""Tools module for agent framework.
+Agent 框架的工具模块。
+"""
 
 from .base import Tool
 from .code_execution import CodeExecutionServerTool
