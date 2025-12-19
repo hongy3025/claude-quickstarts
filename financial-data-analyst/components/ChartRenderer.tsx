@@ -1,3 +1,15 @@
+/**
+ * @file 图表渲染器组件
+ * 
+ * 该文件包含了多种基于 Recharts 的金融数据可视化图表组件。
+ * 支持的图表类型包括：
+ * - 柱状图 (Bar Chart)
+ * - 多重柱状图 (Multi-Bar Chart)
+ * - 折线图 (Line Chart)
+ * - 饼图 (Pie Chart)
+ * - 面积图 (Area Chart)
+ * - 堆叠面积图 (Stacked Area Chart)
+ */
 "use client";
 
 import React from "react";
@@ -30,6 +42,10 @@ import {
 } from "@/components/ui/chart";
 import type { ChartData } from "@/types/chart";
 
+/**
+ * 柱状图组件
+ * @param props.data - 图表配置和数据
+ */
 function BarChartComponent({ data }: { data: ChartData }) {
   const dataKey = Object.keys(data.chartConfig)[0];
 
@@ -69,8 +85,8 @@ function BarChartComponent({ data }: { data: ChartData }) {
       <CardFooter className="flex-col items-start gap-2 text-sm">
         {data.config.trend && (
           <div className="flex gap-2 font-medium leading-none">
-            Trending {data.config.trend.direction} by{" "}
-            {data.config.trend.percentage}% this period{" "}
+            本周期 {data.config.trend.direction === "up" ? "增长" : "下降"}{" "}
+            {data.config.trend.percentage}%{" "}
             {data.config.trend.direction === "up" ? (
               <TrendingUp className="h-4 w-4" />
             ) : (
@@ -88,6 +104,10 @@ function BarChartComponent({ data }: { data: ChartData }) {
   );
 }
 
+/**
+ * 多重柱状图组件
+ * @param props.data - 图表配置和数据
+ */
 function MultiBarChartComponent({ data }: { data: ChartData }) {
   return (
     <Card>
@@ -128,8 +148,8 @@ function MultiBarChartComponent({ data }: { data: ChartData }) {
       <CardFooter className="flex-col items-start gap-2 text-sm">
         {data.config.trend && (
           <div className="flex gap-2 font-medium leading-none">
-            Trending {data.config.trend.direction} by{" "}
-            {data.config.trend.percentage}% this period{" "}
+            本周期 {data.config.trend.direction === "up" ? "增长" : "下降"}{" "}
+            {data.config.trend.percentage}%{" "}
             {data.config.trend.direction === "up" ? (
               <TrendingUp className="h-4 w-4" />
             ) : (
@@ -147,6 +167,10 @@ function MultiBarChartComponent({ data }: { data: ChartData }) {
   );
 }
 
+/**
+ * 折线图组件
+ * @param props.data - 图表配置和数据
+ */
 function LineChartComponent({ data }: { data: ChartData }) {
   return (
     <Card>
@@ -196,8 +220,8 @@ function LineChartComponent({ data }: { data: ChartData }) {
       <CardFooter className="flex-col items-start gap-2 text-sm">
         {data.config.trend && (
           <div className="flex gap-2 font-medium leading-none">
-            Trending {data.config.trend.direction} by{" "}
-            {data.config.trend.percentage}% this period{" "}
+            本周期 {data.config.trend.direction === "up" ? "增长" : "下降"}{" "}
+            {data.config.trend.percentage}%{" "}
             {data.config.trend.direction === "up" ? (
               <TrendingUp className="h-4 w-4" />
             ) : (
@@ -215,6 +239,10 @@ function LineChartComponent({ data }: { data: ChartData }) {
   );
 }
 
+/**
+ * 饼图组件
+ * @param props.data - 图表配置和数据
+ */
 function PieChartComponent({ data }: { data: ChartData }) {
   const totalValue = React.useMemo(() => {
     return data.data.reduce((acc, curr) => acc + curr.value, 0);
@@ -223,7 +251,7 @@ function PieChartComponent({ data }: { data: ChartData }) {
   const chartData = data.data.map((item, index) => {
     return {
       ...item,
-      // Use the same color variable pattern as other charts
+      // 使用与其他图表相同的颜色变量模式
       fill: `hsl(var(--chart-${index + 1}))`,
     };
   });
@@ -288,8 +316,8 @@ function PieChartComponent({ data }: { data: ChartData }) {
       <CardFooter className="flex-col gap-2 text-sm">
         {data.config.trend && (
           <div className="flex items-center gap-2 font-medium leading-none">
-            Trending {data.config.trend.direction} by{" "}
-            {data.config.trend.percentage}% this period{" "}
+            本周期 {data.config.trend.direction === "up" ? "增长" : "下降"}{" "}
+            {data.config.trend.percentage}%{" "}
             {data.config.trend.direction === "up" ? (
               <TrendingUp className="h-4 w-4" />
             ) : (
@@ -307,6 +335,11 @@ function PieChartComponent({ data }: { data: ChartData }) {
   );
 }
 
+/**
+ * 面积图组件（支持普通和堆叠模式）
+ * @param props.data - 图表配置和数据
+ * @param props.stacked - 是否启用堆叠模式
+ */
 function AreaChartComponent({
   data,
   stacked,
@@ -367,8 +400,8 @@ function AreaChartComponent({
           <div className="grid gap-2">
             {data.config.trend && (
               <div className="flex items-center gap-2 font-medium leading-none">
-                Trending {data.config.trend.direction} by{" "}
-                {data.config.trend.percentage}% this period{" "}
+                本周期 {data.config.trend.direction === "up" ? "增长" : "下降"}{" "}
+                {data.config.trend.percentage}%{" "}
                 {data.config.trend.direction === "up" ? (
                   <TrendingUp className="h-4 w-4" />
                 ) : (
@@ -388,6 +421,11 @@ function AreaChartComponent({
   );
 }
 
+/**
+ * 主图表渲染分发组件
+ * 根据 data.chartType 渲染对应的图表组件
+ * @param props.data - 包含图表类型、配置和数据的对象
+ */
 export function ChartRenderer({ data }: { data: ChartData }) {
   switch (data.chartType) {
     case "bar":

@@ -1,90 +1,96 @@
+/**
+ * 客户支持分类配置文件
+ * 定义了客户支持请求的不同分类及其关键词
+ * 
+ * 该文件用于帮助自动分类客户支持请求，通过匹配关键词来确定问题类型
+ */
 {
   "categories": [
     {
       "id": "account",
-      "name": "Account",
+      "name": "账户相关",
       "keywords": [
-        "ban",
-        "appeal",
-        "deletion",
-        "logging in",
-        "phone verification",
-        "roles",
-        "permissions"
+        "封禁",
+        "申诉",
+        "删除",
+        "登录",
+        "手机验证",
+        "角色",
+        "权限"
       ]
     },
     {
       "id": "billing",
-      "name": "Billing",
+      "name": "账单相关",
       "keywords": [
         "AR",
-        "billing details",
-        "invoice",
-        "receipt",
-        "payment method",
-        "pricing",
-        "refund request",
-        "subscription management",
-        "taxes"
+        "账单详情",
+        "发票",
+        "收据",
+        "支付方式",
+        "定价",
+        "退款申请",
+        "订阅管理",
+        "税费"
       ]
     },
     {
       "id": "feature",
-      "name": "Feature",
+      "name": "功能相关",
       "keywords": [
-        "functionality",
-        "tools",
-        "capabilities",
-        "options",
-        "modules",
-        "features"
+        "功能性",
+        "工具",
+        "功能",
+        "选项",
+        "模块",
+        "特性"
       ]
     },
     {
       "id": "internal",
-      "name": "Internal",
+      "name": "内部处理",
       "keywords": [
-        "auto-reply",
-        "forward",
-        "ignore",
-        "spam",
-        "other",
-        "sales reroute"
+        "自动回复",
+        "转发",
+        "忽略",
+        "垃圾邮件",
+        "其他",
+        "销售转接"
       ]
     },
     {
       "id": "legal",
-      "name": "Legal",
-      "keywords": ["data privacy", "policy", "terms of service", "usage policy"]
+      "name": "法律相关",
+      "keywords": ["数据隐私", "政策", "服务条款", "使用政策"]
     },
     {
       "id": "other",
-      "name": "Other",
-      "keywords": ["job inquiry", "3rd party company"]
+      "name": "其他",
+      "keywords": ["求职咨询", "第三方公司"]
     },
     {
       "id": "technical",
-      "name": "Technical",
+      "name": "技术支持",
       "keywords": [
-        "guides",
-        "issue",
-        "security",
-        "downtime",
-        "performance",
-        "interface",
-        "system"
+        "指南",
+        "问题",
+        "安全",
+        "停机",
+        "性能",
+        "界面",
+        "系统"
       ]
     },
     {
       "id": "usage",
-      "name": "Usage",
+      "name": "使用相关",
       "keywords": [
-        "errors",
-        "capabilities",
-        "quality",
-        "techniques",
-        "limits",
-        "availability"
+        "错误",
+        "功能",
+        "质量",
+        "技术",
+        "限制",
+        "可用性"
       ]
     }
   ]

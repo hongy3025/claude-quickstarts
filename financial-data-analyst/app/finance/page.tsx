@@ -1,4 +1,13 @@
 // app/finance/page.tsx
+/**
+ * @file 金融助手聊天页面组件
+ * 
+ * 该页面提供了一个集成的聊天界面，允许用户：
+ * 1. 与 AI (Claude) 进行关于金融数据的对话。
+ * 2. 上传各种文件（CSV、PDF、图片）进行数据分析。
+ * 3. 自动根据 AI 的分析结果生成并展示交互式图表。
+ * 4. 实时切换不同的 AI 模型。
+ */
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
@@ -41,57 +50,99 @@ import {
   readFileAsPDFText,
 } from "@/utils/fileHandling";
 
-// Types
+/**
+ * 消息接口定义
+ */
 interface Message {
+  /** 消息唯一标识符 */
   id: string;
+  /** 消息角色：'user' | 'assistant' */
   role: string;
+  /** 消息文本内容 */
   content: string;
+  /** 标识是否触发了工具调用（如生成图表） */
   hasToolUse?: boolean;
+  /** 消息关联的文件信息 */
   file?: {
+    /** 文件的 Base64 编码数据 */
     base64: string;
+    /** 文件名 */
     fileName: string;
+    /** 媒体类型 (MIME type) */
     mediaType: string;
+    /** 是否为纯文本文件 */
     isText?: boolean;
   };
+  /** AI 生成的图表数据 */
   chartData?: ChartData;
 }
 
+/**
+ * AI 模型配置定义
+ */
 type Model = {
+  /** 模型标识符 */
   id: string;
+  /** 模型显示名称 */
   name: string;
 };
 
+/**
+ * 文件上传状态定义
+ */
 interface FileUpload {
+  /** 文件的 Base64 编码数据 */
   base64: string;
+  /** 文件名 */
   fileName: string;
+  /** 媒体类型 */
   mediaType: string;
+  /** 是否为文本文件 */
   isText?: boolean;
+  /** 文件大小（字节） */
   fileSize?: number;
 }
 
+/**
+ * 可选的 AI 模型列表
+ */
 const models: Model[] = [
   { id: "claude-3-haiku-20240307", name: "Claude 3 Haiku" },
   { id: "claude-haiku-4-5-20251001", name: "Claude 4.5 Haiku" },
   { id: "claude-3-5-sonnet-20240620", name: "Claude 3.5 Sonnet" },
 ];
 
-// Updated APIResponse interface
+/**
+ * API 响应接口定义
+ */
 interface APIResponse {
+  /** AI 生成的文本内容 */
   content: string;
+  /** 是否包含工具调用 */
   hasToolUse: boolean;
+  /** 工具调用详情 */
   toolUse?: {
     type: "tool_use";
     id: string;
     name: string;
     input: ChartData;
   };
+  /** 处理后的图表数据 */
   chartData?: ChartData;
 }
 
+/**
+ * 消息组件属性
+ */
 interface MessageComponentProps {
+  /** 要显示的消息对象 */
   message: Message;
 }
 
+/**
+ * 安全的图表渲染器组件
+ * 封装了错误处理逻辑，确保图表渲染失败不会导致整个页面崩溃
+ */
 const SafeChartRenderer: React.FC<{ data: ChartData }> = ({ data }) => {
   try {
     return (
@@ -102,22 +153,27 @@ const SafeChartRenderer: React.FC<{ data: ChartData }> = ({ data }) => {
       </div>
     );
   } catch (error) {
-    console.error("Chart rendering error:", error);
+    console.error("图表渲染错误:", error);
     const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
+      error instanceof Error ? error.message : "发生未知错误";
     return (
-      <div className="text-red-500">Error rendering chart: {errorMessage}</div>
+      <div className="text-red-500">渲染图表时出错: {errorMessage}</div>
     );
   }
 };
 
+/**
+ * 消息气泡组件
+ * 根据发送者角色显示不同的样式和头像
+ */
 const MessageComponent: React.FC<MessageComponentProps> = ({ message }) => {
-  console.log("Message with chart data:", message); // Add this line for debugging
+  // 用于调试的控制台日志
+  console.log("带有图表数据的消息:", message);
   return (
     <div className="flex items-start gap-2">
       {message.role === "assistant" && (
         <Avatar className="w-8 h-8 border">
-          <AvatarImage src="/ant-logo.svg" alt="AI Assistant Avatar" />
+          <AvatarImage src="/ant-logo.svg" alt="AI 助手头像" />
           <AvatarFallback>AI</AvatarFallback>
         </Avatar>
       )}
@@ -139,19 +195,19 @@ const MessageComponent: React.FC<MessageComponentProps> = ({ message }) => {
               {message.hasToolUse ? (
                 <div className="flex flex-col gap-2">
                   <Badge variant="secondary" className="inline-flex">
-                    <ChartLine className="w-4 h-4 mr-1" /> Generated Chart
+                    <ChartLine className="w-4 h-4 mr-1" /> 已生成图表
                   </Badge>
-                  <span>Thinking...</span>
+                  <span>思考中...</span>
                 </div>
               ) : (
-                <span>Thinking...</span>
+                <span>思考中...</span>
               )}
             </div>
           ) : message.role === "assistant" ? (
             <div className="flex flex-col gap-2">
               {message.hasToolUse && (
                 <Badge variant="secondary" className="inline-flex px-0">
-                  <ChartLine className="w-4 h-4 mr-1" /> Generated Chart
+                  <ChartLine className="w-4 h-4 mr-1" /> 已生成图表
                 </Badge>
               )}
               <span>{message.content}</span>
@@ -170,13 +226,20 @@ const MessageComponent: React.FC<MessageComponentProps> = ({ message }) => {
   );
 };
 
+/**
+ * 图表分页导航组件
+ * 在页面右侧显示小圆点，用于在多个生成的图表之间快速切换
+ */
 const ChartPagination = ({
   total,
   current,
   onDotClick,
 }: {
+  /** 图表总数 */
   total: number;
+  /** 当前选中的图表索引 */
   current: number;
+  /** 点击圆点时的回调函数 */
   onDotClick: (index: number) => void;
 }) => (
   <div className="fixed right-12 top-1/2 -translate-y-1/2 flex flex-col gap-2">
@@ -195,26 +258,41 @@ const ChartPagination = ({
 );
 
 export default function AIChat() {
+  /** 聊天消息列表状态 */
   const [messages, setMessages] = useState<Message[]>([]);
+  /** 当前输入框的文本状态 */
   const [input, setInput] = useState("");
+  /** 标识是否正在等待 AI 响应 */
   const [isLoading, setIsLoading] = useState(false);
+  /** 当前选择的 AI 模型 ID */
   const [selectedModel, setSelectedModel] = useState(
     "claude-3-5-sonnet-20240620",
   );
+  /** 消息列表末尾的引用，用于自动滚动 */
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  /** 图表列表末尾的引用 */
   const chartEndRef = useRef<HTMLDivElement>(null);
+  /** 文件输入框的引用 */
   const fileInputRef = useRef<HTMLInputElement>(null);
+  /** 当前待上传的文件信息状态 */
   const [currentUpload, setCurrentUpload] = useState<FileUpload | null>(null);
+  /** 标识是否正在处理文件上传 */
   const [isUploading, setIsUploading] = useState(false);
+  /** 当前显示的图表索引状态 */
   const [currentChartIndex, setCurrentChartIndex] = useState(0);
+  /** 内容区域的引用，用于处理图表滚动 */
   const contentRef = useRef<HTMLDivElement>(null);
+  /** 标识是否锁定自动滚动 */
   const [isScrollLocked, setIsScrollLocked] = useState(false);
 
+  /**
+   * 自动滚动聊天列表到最新消息
+   */
   useEffect(() => {
     const scrollToBottom = () => {
       if (!messagesEndRef.current) return;
 
-      // Use requestAnimationFrame to ensure DOM has updated
+      // 使用 requestAnimationFrame 确保在 DOM 更新后执行滚动
       requestAnimationFrame(() => {
         messagesEndRef.current?.scrollIntoView({
           behavior: "smooth",
@@ -223,12 +301,15 @@ export default function AIChat() {
       });
     };
 
-    // Scroll when messages change or when loading state changes
+    // 当消息列表或加载状态变化时触发滚动
     const timeoutId = setTimeout(scrollToBottom, 100);
 
     return () => clearTimeout(timeoutId);
-  }, [messages, isLoading]); // Add isLoading to dependencies
+  }, [messages, isLoading]);
 
+  /**
+   * 监听消息列表容器的大小变化，保持滚动位置
+   */
   useEffect(() => {
     if (!messagesEndRef.current) return;
 
@@ -246,6 +327,9 @@ export default function AIChat() {
     return () => observer.disconnect();
   }, [isScrollLocked]);
 
+  /**
+   * 处理图表区域的滚动事件，更新当前图表索引
+   */
   const handleChartScroll = useCallback(() => {
     if (!contentRef.current) return;
 
@@ -254,6 +338,9 @@ export default function AIChat() {
     setCurrentChartIndex(newIndex);
   }, []);
 
+  /**
+   * 滚动到指定的图表索引
+   */
   const scrollToChart = (index: number) => {
     if (!contentRef.current) return;
 
@@ -264,6 +351,9 @@ export default function AIChat() {
     });
   };
 
+  /**
+   * 当收到新的图表数据时，自动滚动到最新的图表
+   */
   useEffect(() => {
     const scrollToNewestChart = () => {
       const chartsCount = messages.filter((m) => m.chartData).length;
@@ -279,20 +369,24 @@ export default function AIChat() {
     }
   }, [messages]);
 
+  /**
+   * 处理文件选择事件
+   * 支持图片、PDF 和普通文本文件
+   */
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
 
-    // Create a ref to store the toast handlers
+    // 存储 Toast 句柄以便后续关闭
     let loadingToastRef: { dismiss: () => void } | undefined;
 
     if (file.type === "application/pdf") {
       loadingToastRef = toast({
-        title: "Processing PDF",
-        description: "Extracting text content...",
-        duration: Infinity, // This will keep the toast until we dismiss it
+        title: "正在处理 PDF",
+        description: "正在提取文本内容...",
+        duration: Infinity,
       });
     }
 
@@ -311,10 +405,10 @@ export default function AIChat() {
           base64Data = btoa(encodeURIComponent(pdfText));
           isText = true;
         } catch (error) {
-          console.error("Failed to parse PDF:", error);
+          console.error("解析 PDF 失败:", error);
           toast({
-            title: "PDF parsing failed",
-            description: "Unable to extract text from the PDF",
+            title: "PDF 解析失败",
+            description: "无法从该 PDF 中提取文本",
             variant: "destructive",
           });
           return;
@@ -325,10 +419,10 @@ export default function AIChat() {
           base64Data = btoa(encodeURIComponent(textContent));
           isText = true;
         } catch (error) {
-          console.error("Failed to read as text:", error);
+          console.error("读取文本文件失败:", error);
           toast({
-            title: "Invalid file type",
-            description: "File must be readable as text, PDF, or be an image",
+            title: "无效的文件类型",
+            description: "文件必须是可读文本、PDF 或图片",
             variant: "destructive",
           });
           return;
@@ -343,31 +437,34 @@ export default function AIChat() {
       });
 
       toast({
-        title: "File uploaded",
-        description: `${file.name} ready to analyze`,
+        title: "文件已上传",
+        description: `${file.name} 已准备好进行分析`,
       });
     } catch (error) {
-      console.error("Error processing file:", error);
+      console.error("处理文件时出错:", error);
       toast({
-        title: "Upload failed",
-        description: "Failed to process the file",
+        title: "上传失败",
+        description: "无法处理该文件",
         variant: "destructive",
       });
     } finally {
       setIsUploading(false);
       if (loadingToastRef) {
-        loadingToastRef.dismiss(); // Use the dismiss method from the toast ref
-        // Show success toast for PDF
+        loadingToastRef.dismiss();
+        // PDF 处理成功提示
         if (file.type === "application/pdf") {
           toast({
-            title: "PDF Processed",
-            description: "Text extracted successfully",
+            title: "PDF 处理完成",
+            description: "文本提取成功",
           });
         }
       }
     }
   };
 
+  /**
+   * 处理表单提交（发送消息）
+   */
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!input.trim() && !currentUpload) return;
@@ -375,6 +472,7 @@ export default function AIChat() {
 
     setIsScrollLocked(true);
 
+    // 创建用户消息对象
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: "user",
@@ -382,29 +480,30 @@ export default function AIChat() {
       file: currentUpload || undefined,
     };
 
+    // 创建一个临时的“思考中”消息
     const thinkingMessage: Message = {
       id: crypto.randomUUID(),
       role: "assistant",
       content: "thinking",
     };
 
-    // Update messages in a single state update
+    // 批量更新消息列表
     setMessages((prev) => [...prev, userMessage, thinkingMessage]);
     setInput("");
     setIsLoading(true);
 
-    // Prepare all messages for the API request
+    // 准备发送到 API 的消息数组
     const apiMessages = [...messages, userMessage].map((msg) => {
       if (msg.file) {
         if (msg.file.isText) {
-          // For text files, decode the content before sending
+          // 对于文本文件，解码内容并整合到文本中
           const decodedText = decodeURIComponent(atob(msg.file.base64));
           return {
             role: msg.role,
-            content: `File contents of ${msg.file.fileName}:\n\n${decodedText}\n\n${msg.content}`,
+            content: `文件 ${msg.file.fileName} 的内容如下:\n\n${decodedText}\n\n${msg.content}`,
           };
         } else {
-          // Handle images as before
+          // 处理图片文件
           return {
             role: msg.role,
             content: [
@@ -424,7 +523,7 @@ export default function AIChat() {
           };
         }
       }
-      // Handle text-only messages
+      // 处理纯文本消息
       return {
         role: msg.role,
         content: msg.content,
@@ -446,11 +545,12 @@ export default function AIChat() {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP 错误! 状态码: ${response.status}`);
       }
 
       const data: APIResponse = await response.json();
 
+      // 将“思考中”消息替换为真正的 AI 回复
       setMessages((prev) => {
         const newMessages = [...prev];
         newMessages[newMessages.length - 1] = {
@@ -466,13 +566,13 @@ export default function AIChat() {
 
       setCurrentUpload(null);
     } catch (error) {
-      console.error("Submit Error:", error);
+      console.error("提交出错:", error);
       setMessages((prev) => {
         const newMessages = [...prev];
         newMessages[newMessages.length - 1] = {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: "I apologize, but I encountered an error. Please try again.",
+          content: "抱歉，我遇到了一个错误。请稍后再试。",
         };
         return newMessages;
       });
@@ -480,7 +580,7 @@ export default function AIChat() {
       setIsLoading(false);
       setIsScrollLocked(false);
 
-      // Force a final scroll after state updates
+      // 强制在状态更新后进行最后一次滚动
       requestAnimationFrame(() => {
         messagesEndRef.current?.scrollIntoView({
           behavior: "smooth",
@@ -490,6 +590,9 @@ export default function AIChat() {
     }
   };
 
+  /**
+   * 处理键盘事件（Enter 键发送，Shift+Enter 换行）
+   */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -506,6 +609,9 @@ export default function AIChat() {
     }
   };
 
+  /**
+   * 处理输入框变化，并自动调整高度
+   */
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = event.target;
     setInput(textarea.value);
@@ -515,6 +621,7 @@ export default function AIChat() {
 
   return (
     <div className="flex flex-col h-screen">
+      {/* 顶部导航栏 */}
       <TopNavBar
         features={{
           showDomainSelector: false,
@@ -524,7 +631,7 @@ export default function AIChat() {
       />
 
       <div className="flex-1 flex bg-background p-4 pt-0 gap-4 h-[calc(100vh-4rem)]">
-        {/* Chat Sidebar */}
+        {/* 聊天侧边栏 */}
         <Card className="w-1/3 flex flex-col h-full">
           <CardHeader className="py-3 px-4">
             <div className="flex items-center justify-between">
@@ -534,22 +641,23 @@ export default function AIChat() {
                     <Avatar className="w-8 h-8 border">
                       <AvatarImage
                         src="/ant-logo.svg"
-                        alt="AI Assistant Avatar"
+                        alt="AI 助手头像"
                       />
                       <AvatarFallback>AI</AvatarFallback>
                     </Avatar>
                     <div>
                       <CardTitle className="text-lg">
-                        Financial Assistant
+                        金融助手
                       </CardTitle>
                       <CardDescription className="text-xs">
-                        Powered by Claude
+                        由 Claude 提供支持
                       </CardDescription>
                     </div>
                   </>
                 )}
               </div>
 
+              {/* 模型选择下拉菜单 */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="h-8 text-sm">
@@ -571,45 +679,45 @@ export default function AIChat() {
             </div>
           </CardHeader>
 
+          {/* 消息展示区域 */}
           <CardContent className="flex-1 overflow-y-auto p-4 scroll-smooth snap-y snap-mandatory">
             {messages.length === 0 ? (
+              /* 初始欢迎界面 */
               <div className="flex flex-col items-center justify-center h-full animate-fade-in-up max-w-[95%] mx-auto">
                 <Avatar className="w-10 h-10 mb-4 border">
                   <AvatarImage
                     src="/ant-logo.svg"
-                    alt="AI Assistant Avatar"
+                    alt="AI 助手头像"
                     width={40}
                     height={40}
                   />
                 </Avatar>
                 <h2 className="text-xl font-semibold mb-2">
-                  Financial Assistant
+                  金融助手
                 </h2>
                 <div className="space-y-4 text-base">
                   <div className="flex items-center gap-3">
                     <ChartArea className="text-muted-foreground w-6 h-6" />
                     <p className="text-muted-foreground">
-                      I can analyze financial data and create visualizations
-                      from your files.
+                      我可以分析金融数据，并根据您的文件创建可视化图表。
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <FileInput className="text-muted-foreground w-6 h-6" />
                     <p className="text-muted-foreground">
-                      Upload CSVs, PDFs, or images and I&apos;ll help you
-                      understand the data.
+                      上传 CSV、PDF 或图片，我将帮您理解其中的数据。
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <MessageCircleQuestion className="text-muted-foreground w-6 h-6" />
                     <p className="text-muted-foreground">
-                      Ask questions about your financial data and I&apos;ll
-                      create insightful charts.
+                      询问有关您金融数据的问题，我将为您创建有见地的图表。
                     </p>
                   </div>
                 </div>
               </div>
             ) : (
+              /* 聊天消息列表 */
               <div className="space-y-4 min-h-full">
                 {messages.map((message) => (
                   <div
@@ -622,14 +730,16 @@ export default function AIChat() {
                   </div>
                 ))}
                 <div ref={messagesEndRef} className="h-4" />{" "}
-                {/* Add height to ensure scroll space */}
+                {/* 增加高度以确保滚动空间 */}
               </div>
             )}
           </CardContent>
 
+          {/* 消息输入区域 */}
           <CardFooter className="p-4 border-t">
             <form onSubmit={handleSubmit} className="w-full">
               <div className="flex flex-col space-y-2">
+                {/* 文件上传预览 */}
                 {currentUpload && (
                   <FilePreview
                     file={currentUpload}
@@ -638,6 +748,7 @@ export default function AIChat() {
                 )}
                 <div className="flex items-end space-x-2">
                   <div className="flex-1 relative">
+                    {/* 文件上传按钮 */}
                     <Button
                       type="button"
                       variant="ghost"
@@ -648,16 +759,18 @@ export default function AIChat() {
                     >
                       <Paperclip className="h-5 w-5" />
                     </Button>
+                    {/* 文本输入框 */}
                     <Textarea
                       value={input}
                       onChange={handleInputChange}
                       onKeyDown={handleKeyDown}
-                      placeholder="Type your message..."
+                      placeholder="输入您的消息..."
                       disabled={isLoading}
                       className="min-h-[44px] h-[44px] resize-none pl-12 py-3 flex items-center"
                       rows={1}
                     />
                   </div>
+                  {/* 发送按钮 */}
                   <Button
                     type="submit"
                     disabled={isLoading || (!input.trim() && !currentUpload)}
@@ -667,6 +780,7 @@ export default function AIChat() {
                   </Button>
                 </div>
               </div>
+              {/* 隐藏的文件输入框 */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -677,12 +791,12 @@ export default function AIChat() {
           </CardFooter>
         </Card>
 
-        {/* Content Area */}
+        {/* 内容区域（图表展示） */}
         <Card className="flex-1 flex flex-col h-full overflow-hidden">
           {messages.some((m) => m.chartData) && (
             <CardHeader className="py-3 px-4 shrink-0">
               <CardTitle className="text-lg">
-                Analysis & Visualizations
+                分析与可视化
               </CardTitle>
             </CardHeader>
           )}
@@ -712,21 +826,22 @@ export default function AIChat() {
                 )}
               </div>
             ) : (
+              /* 无图表时的占位状态 */
               <div className="h-full flex flex-col items-center justify-center text-center">
                 <div className="flex flex-col items-center justify-center gap-4 -translate-y-8">
                   <ChartColumnBig className="w-8 h-8 text-muted-foreground" />
                   <div className="space-y-2">
                     <CardTitle className="text-lg">
-                      Analysis & Visualizations
+                      分析与可视化
                     </CardTitle>
                     <CardDescription className="text-base">
-                      Charts and detailed analysis will appear here as you chat
+                      图表和详细分析将在您聊天时在此处显示
                     </CardDescription>
                     <div className="flex flex-wrap justify-center gap-2 mt-4">
-                      <Badge variant="outline">Bar Charts</Badge>
-                      <Badge variant="outline">Area Charts</Badge>
-                      <Badge variant="outline">Linear Charts</Badge>
-                      <Badge variant="outline">Pie Charts</Badge>
+                      <Badge variant="outline">柱状图</Badge>
+                      <Badge variant="outline">面积图</Badge>
+                      <Badge variant="outline">折线图</Badge>
+                      <Badge variant="outline">饼图</Badge>
                     </div>
                   </div>
                 </div>
@@ -735,6 +850,7 @@ export default function AIChat() {
           </CardContent>
         </Card>
       </div>
+      {/* 图表分页圆点 */}
       {messages.some((m) => m.chartData) && (
         <ChartPagination
           total={messages.filter((m) => m.chartData).length}
