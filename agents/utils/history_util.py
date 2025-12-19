@@ -1,10 +1,14 @@
-"""Message history with token tracking and prompt caching."""
+"""Message history with token tracking and prompt caching.
+带有 Token 追踪和提示词缓存的消息历史管理。
+"""
 
 from typing import Any
 
 
 class MessageHistory:
-    """Manages chat history with token tracking and context management."""
+    """Manages chat history with token tracking and context management.
+    管理聊天历史，具备 Token 追踪和上下文管理功能。
+    """
 
     def __init__(
         self,
@@ -14,6 +18,21 @@ class MessageHistory:
         client: Any,
         enable_caching: bool = True,
     ):
+        """Initialize message history.
+        初始化消息历史。
+
+        Args:
+            model: Model identifier
+                   模型标识符
+            system: System prompt
+                    系统提示词
+            context_window_tokens: Maximum tokens allowed in context window
+                                   上下文窗口允许的最大 Token 数
+            client: Anthropic client for token counting
+                    用于计算 Token 的 Anthropic 客户端
+            enable_caching: Enable prompt caching
+                            是否启用提示词缓存
+        """
         self.model = model
         self.system = system
         self.context_window_tokens = context_window_tokens
@@ -23,9 +42,11 @@ class MessageHistory:
         self.message_tokens: list[tuple[int, int]] = (
             []
         )  # List of (input_tokens, output_tokens) tuples
+           # (输入 Token, 输出 Token) 元组列表
         self.client = client
 
         # set initial total tokens to system prompt
+        # 将初始总 Token 数设置为系统提示词的 Token 数
         try:
             system_token = (
                 self.client.messages.count_tokens(
@@ -47,7 +68,17 @@ class MessageHistory:
         content: str | list[dict[str, Any]],
         usage: Any | None = None,
     ):
-        """Add a message to the history and track token usage."""
+        """Add a message to the history and track token usage.
+        将消息添加到历史记录并追踪 Token 使用情况。
+
+        Args:
+            role: Message role (user or assistant)
+                  消息角色（user 或 assistant）
+            content: Message content
+                     消息内容
+            usage: Token usage information from API response
+                   来自 API 响应的 Token 使用信息
+        """
         if isinstance(content, str):
             content = [{"type": "text", "text": content}]
 
@@ -67,7 +98,9 @@ class MessageHistory:
             self.total_tokens += current_turn_input + output_tokens
 
     def truncate(self) -> None:
-        """Remove oldest messages when context window limit is exceeded."""
+        """Remove oldest messages when context window limit is exceeded.
+        当超过上下文窗口限制时，移除最旧的消息。
+        """
         if self.total_tokens <= self.context_window_tokens:
             return
 
@@ -83,6 +116,9 @@ class MessageHistory:
         }
 
         def remove_message_pair():
+            """Remove the oldest user-assistant message pair.
+            移除最旧的一对用户-助手消息。
+            """
             self.messages.pop(0)
             self.messages.pop(0)
 
@@ -111,7 +147,9 @@ class MessageHistory:
                 )
 
     def format_for_api(self) -> list[dict[str, Any]]:
-        """Format messages for Claude API with optional caching."""
+        """Format messages for Claude API with optional caching.
+        为 Claude API 格式化消息，并支持可选的缓存。
+        """
         result = [
             {"role": m["role"], "content": m["content"]} for m in self.messages
         ]

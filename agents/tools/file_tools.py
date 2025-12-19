@@ -1,4 +1,6 @@
-"""File operation tools for reading and writing files."""
+"""File operation tools for reading and writing files.
+用于读写文件的文件操作工具。
+"""
 
 import asyncio
 import glob
@@ -9,17 +11,23 @@ from .base import Tool
 
 
 class FileReadTool(Tool):
-    """Tool for reading files and listing directories."""
+    """Tool for reading files and listing directories.
+    用于读取文件和列出目录内容的工具。
+    """
 
     def __init__(self):
         super().__init__(
             name="file_read",
             description="""
             Read files or list directory contents.
+            读取文件或列出目录内容。
 
             Operations:
+            操作：
             - read: Read the contents of a file
+                   读取文件内容
             - list: List files in a directory
+                   列出目录中的文件
             """,
             input_schema={
                 "type": "object",
@@ -54,15 +62,21 @@ class FileReadTool(Tool):
         pattern: str = "*",
     ) -> str:
         """Execute a file read operation.
+        执行文件读取操作。
 
         Args:
             operation: The operation to perform (read or list)
+                       要执行的操作（read 或 list）
             path: The file or directory path
+                  文件或目录路径
             max_lines: Maximum lines to read (for read operation, 0 means no limit)
+                       最大读取行数（用于读取操作，0 表示无限制）
             pattern: File pattern to match (for list operation)
+                     要匹配的文件模式（用于列出操作）
 
         Returns:
             Result of the operation as string
+            作为字符串的操作结果
         """
         if operation == "read":
             return await self._read_file(path, max_lines)
@@ -73,10 +87,13 @@ class FileReadTool(Tool):
 
     async def _read_file(self, path: str, max_lines: int = 0) -> str:
         """Read a file from disk.
+        从磁盘读取文件。
         
         Args:
             path: Path to the file to read
+                  要读取的文件路径
             max_lines: Maximum number of lines to read (0 means read entire file)
+                       最大读取行数（0 表示读取整个文件）
         """
         try:
             file_path = Path(path)
@@ -102,7 +119,9 @@ class FileReadTool(Tool):
             return f"Error reading {path}: {str(e)}"
 
     async def _list_files(self, directory: str, pattern: str = "*") -> str:
-        """List files in a directory."""
+        """List files in a directory.
+        列出目录中的文件。
+        """
         try:
             dir_path = Path(directory)
 
@@ -136,17 +155,23 @@ class FileReadTool(Tool):
 
 
 class FileWriteTool(Tool):
-    """Tool for writing and editing files."""
+    """Tool for writing and editing files.
+    用于写入和编辑文件的工具。
+    """
 
     def __init__(self):
         super().__init__(
             name="file_write",
             description="""
             Write or edit files.
+            写入或编辑文件。
 
             Operations:
+            操作：
             - write: Create or completely replace a file
+                   创建或完全替换文件
             - edit: Make targeted changes to parts of a file
+                   对文件的部分内容进行针对性修改
             """,
             input_schema={
                 "type": "object",
@@ -186,16 +211,23 @@ class FileWriteTool(Tool):
         new_text: str = "",
     ) -> str:
         """Execute a file write operation.
+        执行文件写入操作。
 
         Args:
             operation: The operation to perform (write or edit)
+                       要执行的操作（write 或 edit）
             path: The file path
+                  文件路径
             content: Content to write (for write operation)
+                     要写入的内容（用于写入操作）
             old_text: Text to replace (for edit operation)
+                      要替换的文本（用于编辑操作）
             new_text: Replacement text (for edit operation)
+                      替换文本（用于编辑操作）
 
         Returns:
             Result of the operation as string
+            作为字符串的操作结果
         """
         if operation == "write":
             if not content:
@@ -212,7 +244,9 @@ class FileWriteTool(Tool):
             return f"Error: Unsupported operation '{operation}'"
 
     async def _write_file(self, path: str, content: str) -> str:
-        """Write content to a file."""
+        """Write content to a file.
+        将内容写入文件。
+        """
         try:
             file_path = Path(path)
             os.makedirs(file_path.parent, exist_ok=True)
@@ -230,7 +264,9 @@ class FileWriteTool(Tool):
             return f"Error writing to {path}: {str(e)}"
 
     async def _edit_file(self, path: str, old_text: str, new_text: str) -> str:
-        """Make targeted changes to a file."""
+        """Make targeted changes to a file.
+        对文件进行针对性修改。
+        """
         try:
             file_path = Path(path)
 
@@ -253,9 +289,11 @@ class FileWriteTool(Tool):
                         )
 
                     # Count occurrences to warn about multiple matches
+                    # 计算出现次数以对多次匹配发出警告
                     count = content.count(old_text)
                     if count > 1:
                         # Edit with warning about multiple occurrences
+                        # 编辑并对多次出现发出警告
                         new_content = content.replace(old_text, new_text)
                         with open(file_path, "w", encoding="utf-8") as f:
                             f.write(new_content)
@@ -265,6 +303,7 @@ class FileWriteTool(Tool):
                         )
                     else:
                         # One occurrence, straightforward replacement
+                        # 出现一次，直接替换
                         new_content = content.replace(old_text, new_text)
                         with open(file_path, "w", encoding="utf-8") as f:
                             f.write(new_content)
