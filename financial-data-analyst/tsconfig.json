@@ -1,26 +1,42 @@
 {
   "compilerOptions": {
+    /* 目标库编译选项 */
     "lib": ["dom", "dom.iterable", "esnext"],
+    /* 允许编译 JavaScript 文件 */
     "allowJs": true,
+    /* 跳过库文件的类型检查 */
     "skipLibCheck": true,
+    /* 启用所有严格类型检查选项 */
     "strict": true,
+    /* 不生成编译后的文件 */
     "noEmit": true,
+    /* 启用 ES 模块互操作性 */
     "esModuleInterop": true,
+    /* 指定模块代码生成方式 */
     "module": "esnext",
+    /* 模块解析策略 */
     "moduleResolution": "bundler",
+    /* 允许导入 .json 文件 */
     "resolveJsonModule": true,
+    /* 将每个文件作为单独的模块进行转译 */
     "isolatedModules": true,
+    /* 在 .tsx 文件中支持 JSX */
     "jsx": "preserve",
+    /* 启用增量编译 */
     "incremental": true,
+    /* 使用的插件列表 */
     "plugins": [
       {
         "name": "next"
       }
     ],
+    /* 路径别名配置 */
     "paths": {
       "@/*": ["./*"]
     }
   },
+  /* 包含编译的文件/目录 */
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  /* 排除编译的目录 */
   "exclude": ["node_modules"]
 }

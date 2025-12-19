@@ -182,13 +182,13 @@ const TopNavBar = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleModeChange("light")}>
-              Light
+              浅色模式
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleModeChange("dark")}>
-              Dark
+              深色模式
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleModeChange("system")}>
-              System
+              系统默认
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -198,7 +198,7 @@ const TopNavBar = () => {
           rel="noopener noreferrer"
         >
           <Button variant="outline" className="text-foreground">
-            Deploy your own
+            部署您自己的应用
           </Button>
         </Link>
       </div>

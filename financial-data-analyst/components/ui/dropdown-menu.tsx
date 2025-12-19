@@ -1,3 +1,9 @@
+/**
+ * @file 下拉菜单组件库 (Dropdown Menu)
+ * 
+ * 基于 @radix-ui/react-dropdown-menu 构建的高级菜单系统。
+ * 支持嵌套子菜单、单选/复选项目、快捷键提示和各种对齐选项。
+ */
 "use client"
 
 import * as React from "react"
@@ -10,21 +16,31 @@ import {
 
 import { cn } from "@/lib/utils"
 
+/** 根菜单容器 */
 const DropdownMenu = DropdownMenuPrimitive.Root
 
+/** 菜单触发器 */
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
+/** 菜单项目分组 */
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 
+/** 菜单传送门（用于将菜单渲染到 DOM 根部） */
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal
 
+/** 子菜单根容器 */
 const DropdownMenuSub = DropdownMenuPrimitive.Sub
 
+/** 单选项目组容器 */
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 
+/**
+ * 子菜单触发器组件
+ */
 const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
+    /** 是否添加内边距缩进 */
     inset?: boolean
   }
 >(({ className, inset, children, ...props }, ref) => (
@@ -44,6 +60,9 @@ const DropdownMenuSubTrigger = React.forwardRef<
 DropdownMenuSubTrigger.displayName =
   DropdownMenuPrimitive.SubTrigger.displayName
 
+/**
+ * 子菜单内容容器组件
+ */
 const DropdownMenuSubContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
@@ -60,6 +79,9 @@ const DropdownMenuSubContent = React.forwardRef<
 DropdownMenuSubContent.displayName =
   DropdownMenuPrimitive.SubContent.displayName
 
+/**
+ * 菜单主要内容容器组件
+ */
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
@@ -79,9 +101,13 @@ const DropdownMenuContent = React.forwardRef<
 ))
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
+/**
+ * 单个菜单项目组件
+ */
 const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
+    /** 是否添加内边距缩进 */
     inset?: boolean
   }
 >(({ className, inset, ...props }, ref) => (
@@ -97,6 +123,9 @@ const DropdownMenuItem = React.forwardRef<
 ))
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
+/**
+ * 复选框菜单项目组件
+ */
 const DropdownMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
@@ -121,6 +150,9 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 DropdownMenuCheckboxItem.displayName =
   DropdownMenuPrimitive.CheckboxItem.displayName
 
+/**
+ * 单选框菜单项目组件
+ */
 const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
@@ -143,9 +175,13 @@ const DropdownMenuRadioItem = React.forwardRef<
 ))
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
 
+/**
+ * 菜单标签组件（用于显示组标题）
+ */
 const DropdownMenuLabel = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
+    /** 是否添加内边距缩进 */
     inset?: boolean
   }
 >(({ className, inset, ...props }, ref) => (
@@ -161,6 +197,9 @@ const DropdownMenuLabel = React.forwardRef<
 ))
 DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName
 
+/**
+ * 菜单分隔线组件
+ */
 const DropdownMenuSeparator = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
@@ -173,6 +212,9 @@ const DropdownMenuSeparator = React.forwardRef<
 ))
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 
+/**
+ * 菜单快捷键提示组件
+ */
 const DropdownMenuShortcut = ({
   className,
   ...props

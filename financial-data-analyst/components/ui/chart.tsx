@@ -1,3 +1,9 @@
+/**
+ * @file 图表组件库
+ * 
+ * 该文件提供了一组基于 Recharts 的高级图表组件，包括容器、提示框（Tooltip）、图例（Legend）等。
+ * 它集成了主题支持（浅色/深色模式）和动态样式生成。
+ */
 "use client"
 
 import * as React from "react"
@@ -10,25 +16,43 @@ import {
 
 import { cn } from "@/lib/utils"
 
-// Format: { THEME_NAME: CSS_SELECTOR }
+/**
+ * 主题配置映射：{ 主题名称: CSS 选择器 }
+ */
 const THEMES = { light: "", dark: ".dark" } as const
 
+/**
+ * 图表配置类型定义
+ */
 export type ChartConfig = {
   [k in string]: {
+    /** 显示的标签名称 */
     label?: React.ReactNode
+    /** 可选的图标组件 */
     icon?: React.ComponentType
   } & (
+    /** 颜色配置：可以直接指定颜色，也可以根据主题指定不同的颜色 */
     | { color?: string; theme?: never }
     | { color?: never; theme: Record<keyof typeof THEMES, string> }
   )
 }
 
+/**
+ * 图表上下文属性定义
+ */
 type ChartContextProps = {
   config: ChartConfig
 }
 
+/**
+ * 图表上下文，用于在组件树中传递配置
+ */
 const ChartContext = React.createContext<ChartContextProps | null>(null)
 
+/**
+ * 自定义 Hook，用于获取图表上下文配置
+ * @throws 如果在 ChartContainer 之外使用，则抛出错误
+ */
 function useChart() {
   const context = React.useContext(ChartContext)
 
@@ -39,6 +63,10 @@ function useChart() {
   return context
 }
 
+/**
+ * 图表容器组件
+ * 负责提供上下文、响应式容器以及动态注入的主题样式
+ */
 const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
@@ -72,6 +100,10 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+/**
+ * 图表样式注入组件
+ * 根据配置动态生成 CSS 变量，用于图表元素的着色
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([_, config]) => config.theme || config.color
@@ -105,16 +137,28 @@ ${colorConfig
   )
 }
 
+/**
+ * 图表提示框组件 (直接导出 Recharts 的 Tooltip)
+ */
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+/**
+ * 图表提示框内容组件
+ * 提供了高度可定制的提示框渲染逻辑，支持标签、指标、格式化等
+ */
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
     React.ComponentProps<"div"> & {
+      /** 是否隐藏标签 */
       hideLabel?: boolean
+      /** 是否隐藏指示器（小方块/线条） */
       hideIndicator?: boolean
+      /** 指示器类型：点、线或虚线 */
       indicator?: "line" | "dot" | "dashed"
+      /** 用于显示名称的键名 */
       nameKey?: string
+      /** 用于显示标签的键名 */
       labelKey?: string
     }
 >(
@@ -138,6 +182,9 @@ const ChartTooltipContent = React.forwardRef<
   ) => {
     const { config } = useChart()
 
+    /**
+     * 计算提示框显示的标签内容
+     */
     const tooltipLabel = React.useMemo(() => {
       if (hideLabel || !payload?.length) {
         return null
@@ -261,13 +308,22 @@ const ChartTooltipContent = React.forwardRef<
 )
 ChartTooltipContent.displayName = "ChartTooltip"
 
+/**
+ * 图表图例组件 (直接导出 Recharts 的 Legend)
+ */
 const ChartLegend = RechartsPrimitive.Legend
 
+/**
+ * 图表图例内容组件
+ * 负责渲染图例中的每一项，包括颜色指示器和标签
+ */
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+      /** 是否隐藏图标 */
       hideIcon?: boolean
+      /** 用于匹配配置的键名 */
       nameKey?: string
     }
 >(
@@ -321,7 +377,14 @@ const ChartLegendContent = React.forwardRef<
 )
 ChartLegendContent.displayName = "ChartLegend"
 
-// Helper to extract item config from a payload.
+/**
+ * 辅助函数：从数据负载 (Payload) 中提取对应的配置项
+ * 
+ * @param config - 图表配置对象
+ * @param payload - Recharts 的数据负载对象
+ * @param key - 用于查找配置的键名
+ * @returns 匹配的配置项或 undefined
+ */
 function getPayloadConfigFromPayload(
   config: ChartConfig,
   payload: unknown,

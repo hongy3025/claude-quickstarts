@@ -1,10 +1,21 @@
+/**
+ * @file 文本域组件 (Textarea)
+ * 
+ * 用于多行文本输入的表单控件。
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * 文本域组件属性接口
+ */
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
+/**
+ * 文本域组件
+ */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...props }, ref) => {
     return (

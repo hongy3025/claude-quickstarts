@@ -63,6 +63,23 @@ const getMoodColor = (mood: string): string => {
 };
 
 /**
+ * 根据情绪字符串返回中文标签
+ * @param {string} mood - 用户情绪字符串
+ * @returns {string} 中文情绪标签
+ */
+const getMoodLabel = (mood: string): string => {
+  const labels: { [key: string]: string } = {
+    positive: "正面",
+    negative: "负面",
+    curious: "好奇",
+    frustrated: "沮丧",
+    confused: "困惑",
+    neutral: "中性",
+  };
+  return labels[mood?.toLowerCase()] || mood;
+};
+
+/**
  * @const {number} MAX_THINKING_HISTORY - 定义侧边栏中保留的思考历史记录的最大数量
  */
 const MAX_THINKING_HISTORY = 15;
@@ -163,8 +180,7 @@ const LeftSidebar: React.FC = () => {
                       <span
                         className={`px-2 py-1 rounded-full ${getMoodColor(content.user_mood)}`}
                       >
-                        {content.user_mood.charAt(0).toUpperCase() +
-                          content.user_mood.slice(1)}
+                        {getMoodLabel(content.user_mood)}
                       </span>
 
                       <span

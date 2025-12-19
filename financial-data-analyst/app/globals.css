@@ -1,3 +1,4 @@
+/* 导入 Tailwind 的基础样式、组件和实用工具 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,12 +8,14 @@ body {
 }
 
 @layer utilities {
+    /* 文本平衡，防止单行文本溢出 */
     .text-balance {
         text-wrap: balance;
     }
 }
 
 @layer base {
+    /* 浅色模式变量 */
     :root {
         --background: 0 0% 100%;
         --foreground: 222.2 84% 4.9%;
@@ -40,6 +43,7 @@ body {
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
     }
+    /* 深色模式变量 */
     .dark {
         --background: 222.2 84% 4.9%;
         --foreground: 210 40% 98%;
@@ -78,6 +82,7 @@ body {
 }
 
 @layer utilities {
+    /* 向上淡入动画 */
     @keyframes fadeInUp {
         0% {
             opacity: 0;
@@ -89,6 +94,7 @@ body {
         }
     }
 
+    /* 脉冲动画 */
     @keyframes pulse {
         0%,
         100% {

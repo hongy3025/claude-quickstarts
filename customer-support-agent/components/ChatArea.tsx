@@ -318,7 +318,7 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
             <AvatarFallback>AI</AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-sm font-medium leading-none">AI Agent</h3>
+            <h3 className="text-sm font-medium leading-none">AI 助手</h3>
             <p className="text-sm text-muted-foreground">客户支持</p>
           </div>
         </>
@@ -355,7 +355,7 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({
             className="flex-grow text-muted-foreground  sm:flex-grow-0"
           >
             {knowledgeBases.find((kb) => kb.id === selectedKnowledgeBase)
-              ?.name || "Select KB"}
+              ?.name || "选择知识库"}
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -419,7 +419,7 @@ function ChatArea() {
    * @const {KnowledgeBase[]} knowledgeBases - 可用的知识库列表
    */
   const knowledgeBases: KnowledgeBase[] = [
-    { id: "your-knowledge-base-id", name: "Your KB Name" },
+    { id: "your-knowledge-base-id", name: "您的知识库" },
     // 在此添加更多知识库
   ];
 

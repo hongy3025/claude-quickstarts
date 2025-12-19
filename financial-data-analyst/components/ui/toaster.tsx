@@ -1,3 +1,9 @@
+/**
+ * @file Toaster 管理器
+ * 
+ * 负责渲染当前状态中的所有 Toast 通知。
+ * 该组件通常放置在根布局中。
+ */
 "use client"
 
 import { useToast } from "@/hooks/use-toast"
@@ -10,6 +16,10 @@ import {
   ToastViewport,
 } from "@/components/ui/toast"
 
+/**
+ * Toaster 组件
+ * 遍历并显示所有的通知项目
+ */
 export function Toaster() {
   const { toasts } = useToast()
 

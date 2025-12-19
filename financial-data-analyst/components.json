@@ -1,13 +1,13 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
   "style": "new-york",
-  "rsc": true,
-  "tsx": true,
+  "rsc": true, // 是否启用 React Server Components
+  "tsx": true, // 是否使用 TypeScript
   "tailwind": {
-    "config": "tailwind.config.ts",
-    "css": "app/globals.css",
-    "baseColor": "stone",
-    "cssVariables": true,
+    "config": "tailwind.config.ts", // Tailwind 配置文件路径
+    "css": "app/globals.css", // 全局 CSS 文件路径
+    "baseColor": "stone", // 基础配色方案
+    "cssVariables": true, // 是否使用 CSS 变量进行样式定制
     "prefix": ""
   },
   "aliases": {

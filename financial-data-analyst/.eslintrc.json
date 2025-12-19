@@ -1,7 +1,7 @@
 {
-  "extends": "next",
+  "extends": "next", // 继承 Next.js 默认的 ESLint 配置
   "rules": {
-    "react/no-unescaped-entities": "off",
-    "@next/next/no-page-custom-font": "off"
+    "react/no-unescaped-entities": "off", // 禁用 React 未转义字符检查
+    "@next/next/no-page-custom-font": "off" // 禁用自定义字体警告
   }
 }

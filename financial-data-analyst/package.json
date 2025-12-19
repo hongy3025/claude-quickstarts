@@ -1,4 +1,5 @@
 {
+  "//": "金融数据分析助手项目的配置文件，包含项目元数据、脚本和依赖项",
   "name": "financial-assistant",
   "version": "0.1.0",
   "private": true,
